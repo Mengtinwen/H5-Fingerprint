@@ -1,0 +1,160 @@
+<!doctype html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<link href="css/mui.min.css" rel="stylesheet" />
+		<link rel="stylesheet" type="text/css" href="http://at.alicdn.com/t/font_768223_t8q5xy5ud3.css"/>
+	</head>
+	<style type="text/css">
+		#btn{
+		    margin: 90px auto;
+    		display: block;
+		}
+		
+		.fin-box{
+			position: absolute;
+		    width: 100%;
+		    background: rgba(0, 0, 0, 0.5);
+		    top: 0;
+		    z-index: 999;
+		    left: 0;
+		    bottom: 0;
+		    display: none;
+		}
+		
+		.fin-box .fin-box-1{
+			background: #fff;
+		    width: 65%;
+		    margin: 240px auto;
+		    height: 150px;
+		    border-radius: 3px;
+		}
+		
+		.fin-box .fin-box-1 .title{
+		    font-size: 16px;
+		    color: #555;
+		    height: 30px;
+		    line-height: 30px;
+		    padding: 0 15px;
+		    margin-bottom: 10px;
+		    border-bottom: 1px solid #ccc;
+		}
+		
+		.body{
+		    height: 60%;
+		    padding: 0 15px;
+		    font-size: 14px;
+		    color: #555;
+	        line-height: 80px;
+		}
+		
+		.iconfont {font-size: 45px;}
+	</style>
+	<body>
+		<header class="mui-bar mui-bar-nav">
+		    <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+		    <h1 class="mui-title">指纹测试</h1>
+		</header>
+		
+		<div class="mui-content">
+			<div class="fin-box">
+				<div class="fin-box-1">
+					<div class="title">指纹验证</div>
+					<div class="body mui-row">
+						<div class="mui-col-xs-4"><span class="iconfont icon-zhiwenyanzheng"></span></div>
+						<div class="mui-col-xs-8 gan">触摸感应器</div>
+					</div>
+				</div>
+			</div>
+			
+			
+			
+		   <button id="btn" type="button">指纹认证</button>
+		</div>
+		
+		<script src="js/mui.min.js"></script>
+		<script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+		<script type="text/javascript">
+			mui.init()
+			
+			
+			mui.plusReady(function(){
+				show();
+			})
+			
+			$("#btn").on("tap",function(){
+				show();
+			})
+			
+			function show(){
+				$(".fin-box").fadeIn(100)
+				finv();
+			}
+			
+			
+			function finv(){
+				var xu = plus.fingerprint.isSupport()//当前设备环境是否支持指纹识别
+				var pwd = plus.fingerprint.isKeyguardSecure()//当前设备是否设置密码锁屏
+				var xc = plus.fingerprint.isEnrolledFingerprints()//当前设备是否已经录入指纹
+				if(xu){
+					if(pwd){
+						if(xc){
+							plus.fingerprint.authenticate(function(e){//指纹识别认证
+								$(".gan").text("指纹认证成功")
+								setTimeout(function(){
+									$(".fin-box").fadeOut(100)	
+									backc();
+								},500)
+							},function(error){
+								console.log(JSON.stringify(error))
+								switch(error.code){
+									case 1:
+										$(".gan").text("不支持指纹识别")
+										backc();
+										break
+									case 2:
+										$(".gan").text("设备未设置密码锁屏")
+										backc();
+										break
+									case 3:
+										$(".gan").text("未录入指纹识别")
+										backc();
+										break
+									case 4:
+										$(".gan").text("指纹识别不匹配")
+										backc();
+										break
+									case 5:
+										$(".gan").text("指纹识别次数超过限制")
+										break
+									case 6:
+										$(".gan").text("取消指纹识别")
+										break
+									default:
+										$(".gan").text("未知错误")
+								}
+							})
+						}else{
+							plus.nativeUI.alert("您的设备没有录入指纹")
+						}
+					}else{
+						plus.nativeUI.alert("您的设备没有设置密码锁屏")
+					}
+				}else{
+					plus.nativeUI.alert("您的设备不支持支持指纹识别")
+				}
+			}
+			
+			
+			function backc(){
+				setTimeout(function(){
+					$(".gan").text("触摸感应器")
+				},500)
+			}
+			
+		</script>
+	</body>
+</html>
